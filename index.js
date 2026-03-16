@@ -30,30 +30,6 @@ async function startXBot() {
         keepAliveIntervalMs: 10000
     });
 
-    // Nömrə ilə qoşulma hissəsi - TƏK KOD ÜÇÜN DÜZƏLDİLDİ
-    if (!sock.authState.creds.registered) {
-        const myNumber = "994502529272"; 
-        
-        // Dövrəyə girməməsi üçün təkrar istəyi bloklayan sadə bir yoxlama
-        if (!global.isPairingSent) {
-            global.isPairingSent = true;
-            console.log("⏳ WhatsApp sistemi hazırlanır, 15 saniyə gözləyin...");
-            
-            setTimeout(async () => {
-                try {
-                    let code = await sock.requestPairingCode(myNumber);
-                    console.log(`\n\n************************************`);
-                    console.log(`🚀 SƏNİN TƏK QOŞULMA KODUN: ${code}`);
-                    console.log(`************************************\n\n`);
-                    console.log("⚠️ Kod gəldi. İndi rahatca WhatsApp-a yaza bilərsən. Başqa kod gəlməyəcək.");
-                } catch (err) {
-                    console.log("Kod alınarkən xəta: ", err);
-                    global.isPairingSent = false;
-                }
-            }, 15000); 
-        }
-    }
-
     sock.ev.on("creds.update", saveCreds);
 
     sock.ev.on("messages.upsert", async (m) => {
@@ -68,12 +44,12 @@ async function startXBot() {
 
         // AFK Kontrolü (Kimsə mənə yazanda)
         if (!isMe && afkData.status) {
-            await sock.sendMessage(from, { text: `📢 *Huseyn hazırda AFK-dır.*\n📝 *Səbəb:* ${afkData.reason}\n⏰ *Vaxt:* ${afkData.time}` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `📢 *Hüseyn hazırda AFK-dır.*\n📝 *Səbəb:* ${afkData.reason}\n⏰ *Vaxt:* ${afkData.time}` }, { quoted: msg });
         }
 
         // Welcome (Qarşılama) Sistemi
         if (!isMe && welcomeStatus && !isGroup && text && !text.startsWith(prefix)) {
-            await sock.sendMessage(from, { text: "Salam! Mən Xəyalın köməkçi botuyam. Hazırda aktiv deyiləmsə, mesajınızı buraxın, tezliklə cavab verəcək. 😊" });
+            await sock.sendMessage(from, { text: "Salam! Mən Hüseynin köməkçi botuyam. Hazırda aktiv deyiləmsə, mesajınızı buraxın, tezliklə cavab verəcək. 😊" });
         }
 
         // Filter Sistemi (Sözləri yoxla)
@@ -145,11 +121,11 @@ async function startXBot() {
         }
 
         // --- SƏS FUNKSİYALARI (TTS) ---
-        const handleTTS = async (lang, accent = null) => {
+        const handleTTS = async (lang) => {
             const content = args.join(" ");
             if (!content) return sock.sendMessage(from, { text: "Mətn yazın!" });
             const fileName = join(__dirname, `tts-${Date.now()}.mp3`);
-            const speech = new gtts(content, accent || lang);
+            const speech = new gtts(content, lang);
             speech.save(fileName, async () => {
                 await sock.sendMessage(from, { audio: { url: fileName }, mimetype: 'audio/mp4', ptt: true }, { quoted: msg });
                 fs.unlinkSync(fileName);
@@ -162,7 +138,7 @@ async function startXBot() {
         if (command === "tts-ar") await handleTTS('ar');
         if (command === "tts-fr") await handleTTS('fr');
 
-        // --- KÖHNƏ QRUP KOMANDALARI ---
+        // --- QRUP KOMANDALARI ---
         if (command === "tagall" && isGroup) {
             const group = await sock.groupMetadata(from);
             let teks = `📢 *Hüseynin Çağırışı:* \n\n`;
@@ -186,14 +162,35 @@ async function startXBot() {
         }
     });
 
-    sock.ev.on("connection.update", (update) => {
+    sock.ev.on("connection.update", async (update) => {
         const { connection, lastDisconnect } = update;
-        if (connection === "close") {
-            // Bağlantı kəsilsə, yenidən cəhd etmədən əvvəl pairing bayrağını sıfırla
-            global.isPairingSent = false;
-            if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) startXBot();
-        } else if (connection === "open") {
+
+        if (connection === "open") {
             console.log("X-Bot aktivdir! Hüseyn üçün çalışır.");
+
+            // Bağlantı açıldıqda, qeydiyyat olmadıqda kodu al
+            if (!sock.authState.creds.registered && !global.isPairingSent) {
+                global.isPairingSent = true;
+                try {
+                    await delay(2000);
+                    const myNumber = "9945002529272";
+                    let code = await sock.requestPairingCode(myNumber);
+                    console.log(`\n************************************`);
+                    console.log(`🚀 QOŞULMA KODUN: ${code}`);
+                    console.log(`************************************\n`);
+                    console.log("⚠️ Kodu WhatsApp-da daxil et. Başqa kod gəlməyəcək.");
+                } catch (err) {
+                    console.log("Kod alınarkən xəta:", err.message);
+                    global.isPairingSent = false;
+                }
+            }
+        }
+
+        if (connection === "close") {
+            global.isPairingSent = false;
+            if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+                startXBot();
+            }
         }
     });
 }
