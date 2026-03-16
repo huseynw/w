@@ -32,7 +32,7 @@ async function startXBot() {
 
     // Nömrə ilə qoşulma hissəsi - TƏK KOD ÜÇÜN DÜZƏLDİLDİ
     if (!sock.authState.creds.registered) {
-        const myNumber = "994554752909"; 
+        const myNumber = "994502529272"; 
         
         // Dövrəyə girməməsi üçün təkrar istəyi bloklayan sadə bir yoxlama
         if (!global.isPairingSent) {
@@ -68,7 +68,7 @@ async function startXBot() {
 
         // AFK Kontrolü (Kimsə mənə yazanda)
         if (!isMe && afkData.status) {
-            await sock.sendMessage(from, { text: `📢 *Xəyal hazırda AFK-dır.*\n📝 *Səbəb:* ${afkData.reason}\n⏰ *Vaxt:* ${afkData.time}` }, { quoted: msg });
+            await sock.sendMessage(from, { text: `📢 *Huseyn hazırda AFK-dır.*\n📝 *Səbəb:* ${afkData.reason}\n⏰ *Vaxt:* ${afkData.time}` }, { quoted: msg });
         }
 
         // Welcome (Qarşılama) Sistemi
@@ -91,7 +91,7 @@ async function startXBot() {
         if (command === "kömək" || command === "menu") {
             const time = moment().tz("Asia/Baku").format("HH:mm:ss");
             let menu = `✨ *X-BOT USERBOT SİSTEMİ* ✨\n\n`;
-            menu += `👤 *Sahib:* Xəyal\n`;
+            menu += `👤 *Sahib:* Hüseyn\n`;
             menu += `⏰ *Saat:* ${time}\n\n`;
             
             menu += `🛡️ *AFK & FİLTER & GREET* 🛡️\n`;
@@ -108,7 +108,7 @@ async function startXBot() {
             menu += `🛠️ *DİGƏR* 🛠️\n`;
             menu += `• \`.tagall\`, \`.ping\`, \`.alive\`, \`.calc\`, \`.runtime\`, \`.sahib\`\n\n`;
             
-            menu += `🌟 *Sahib: Xəyal*`;
+            menu += `🌟 *Sahib: Hüseyn*`;
             await sock.sendMessage(from, { text: menu }, { quoted: msg });
         }
 
@@ -117,12 +117,12 @@ async function startXBot() {
             afkData.status = true;
             afkData.reason = args.join(" ") || "Məşğul";
             afkData.time = moment().tz("Asia/Baku").format("HH:mm:ss");
-            await sock.sendMessage(from, { text: "✅ AFK rejimi aktiv edildi. Xəyal artıq istirahət edir!" });
+            await sock.sendMessage(from, { text: "✅ AFK rejimi aktiv edildi. Hüseyn artıq istirahət edir!" });
         }
 
         if (command === "afkoff" && isMe) {
             afkData.status = false;
-            await sock.sendMessage(from, { text: "Welcome Back Xəyal! AFK rejimi söndürüldü." });
+            await sock.sendMessage(from, { text: "Welcome Back Hüseyn! AFK rejimi söndürüldü." });
         }
 
         // --- FİLTER KOMANDALARI ---
@@ -165,15 +165,15 @@ async function startXBot() {
         // --- KÖHNƏ QRUP KOMANDALARI ---
         if (command === "tagall" && isGroup) {
             const group = await sock.groupMetadata(from);
-            let teks = `📢 *Xəyalın Çağırışı:* \n\n`;
+            let teks = `📢 *Hüseynin Çağırışı:* \n\n`;
             for (let mem of group.participants) { teks += ` @${mem.id.split('@')[0]}`; }
             sock.sendMessage(from, { text: teks, mentions: group.participants.map(a => a.id) });
         }
 
         // --- DİGƏR KOMANDALAR ---
         if (command === "ping") await sock.sendMessage(from, { text: "🚀 *Sürət:* 0.89ms" });
-        if (command === "alive") await sock.sendMessage(from, { text: "Bəli Xəyal, mən aktivəm! 🟢" });
-        if (command === "sahib") await sock.sendMessage(from, { text: "Mənim sahibim *Xəyal*-dır. ✨" });
+        if (command === "alive") await sock.sendMessage(from, { text: "Bəli Hüseyn, mən aktivəm! 🟢" });
+        if (command === "sahib") await sock.sendMessage(from, { text: "Mənim sahibim *Hüseyn*-dir. ✨" });
         if (command === "calc") {
             try { await sock.sendMessage(from, { text: `Nəticə: *${eval(args.join(""))}*` }); } 
             catch { await sock.sendMessage(from, { text: "Səhv hesab!" }); }
@@ -193,7 +193,7 @@ async function startXBot() {
             global.isPairingSent = false;
             if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) startXBot();
         } else if (connection === "open") {
-            console.log("X-Bot aktivdir! Xəyal üçün çalışır.");
+            console.log("X-Bot aktivdir! Hüseyn üçün çalışır.");
         }
     });
 }
